@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+<title>Таро | Глубокий разбор</title>
+<!-- Подключаем премиальные шрифты (Cinzel для заголовков, Cormorant для текста) -->
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=Montserrat:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  /* Палитра из референса */
+  --bg-dark: #0c0714;
+  --bg-panel: rgba(18, 10, 26, 0.85);
+  --gold: #dcb375;
+  --gold-dim: rgba(220, 179, 117, 0.3);
+  --text-light: #f7eedf;
+  --text-muted: #b8a6c4;
+}
+
+* { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+html, body {
+  margin: 0; padding: 0; width: 100%; height: 100%;
+  background-color: var(--bg-dark);
+  color: var(--text-light);
+  font-family: 'Cormorant Garamond', serif;
+  overflow: hidden; /* Скрываем основной скролл, скроллится будет .app */
+}
+
+/* --- АНИМАЦИЯ ЗВЕЗД --- */
+.bg-animation {
+  position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+  z-index: 0; pointer-events: none;
+  background: radial-gradient(circle at 50% 30%, #201030 0%, #0c0714 100%);
+}
+#stars, #stars2, #stars3 { background: transparent; }
+#stars { width: 1px; height: 1px; box-shadow: 117px 613px #FFF, 388px 635px #FFF, 944px 914px #FFF, 247px 277px #FFF, 192px 205px #FFF, 156px 517px #FFF, 220px 839px #FFF, 153px 400px #FFF, 170px 13px #FFF, 550px 702px #FFF, 155px 56px #FFF, 88px 709px #FFF, 300px 800px #FFF; animation: animStar 50s linear infinite; }
+#stars2 { width: 2px; height: 2px; box-shadow: 117px 306px #FFF, 78px 783px #FFF, 179px 85px #FFF, 145px 920px #FFF, 422px 233px #FFF, 387px 98px #FFF, 153px 637px #FFF, 84px 782px #FFF, 476px 453px #FFF, 200px 500px #FFF; animation: animStar 100s linear infinite; }
+#stars3 { width: 3px; height: 3px; box-shadow: 40px 360px #FFF, 71px 539px #FFF, 110px 414px #FFF, 36px 299px #FFF, 44px 420px #FFF, 253px 449px #FFF, 257px 250px #FFF, 88px 830px #FFF; animation: animStar 150s linear infinite; }
+@keyframes animStar { from { transform: translateY(0px); } to { transform: translateY(-1000px); } }
+
+/* --- ОСНОВНОЙ КОНТЕЙНЕР --- */
+.app {
+  position: relative; width: 100%; height: 100dvh; overflow-y: auto; overflow-x: hidden;
+  max-width: 480px; margin: 0 auto; z-index: 1; display: flex; align-items: center;
+}
+
+/* Скрываем скроллбар для красоты */
+.app::-webkit-scrollbar { display: none; }
+.app { -ms-overflow-style: none; scrollbar-width: none; }
+
+.scene {
+  position: absolute; inset: 0; padding: 24px;
+  display: flex; flex-direction: column; justify-content: center;
+  transition: opacity 0.6s ease, transform 0.6s ease;
+}
+.scene.hidden { opacity: 0; pointer-events: none; transform: scale(0.97); }
+
+/* --- ТИПОГРАФИКА --- */
+h1, h2, h3 { font-family: 'Cinzel', serif; font-weight: 600; text-align: center; margin: 0; color: var(--text-light); }
+h1 { font-size: 28px; margin-bottom: 10px; letter-spacing: 1px; }
+h2 { font-size: 22px; color: var(--gold); }
+p.text { font-size: 18px; line-height: 1.4; text-align: center; color: var(--text-muted); margin-bottom: 24px; }
+.separator { width: 60px; height: 1px; background: var(--gold); margin: 0 auto 20px; opacity: 0.5; }
+
+/* --- МИСТИЧЕСКАЯ ПАНЕЛЬ --- */
+.mystic-panel {
+  background: var(--bg-panel);
+  border: 1px solid var(--gold-dim);
+  border-radius: 16px;
+  padding: 30px 20px;
+  box-shadow: 0 10px 40px rgba(0,0,0,0.8), inset 0 0 20px rgba(220,179,117,0.05);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  position: relative;
+}
+/* Декоративные уголки */
+.mystic-panel::before, .mystic-panel::after {
+  content: ''; position: absolute; width: 10px; height: 10px; border: 1px solid var(--gold);
+}
+.mystic-panel::before { top: 8px; left: 8px; border-right: none; border-bottom: none; }
+.mystic-panel::after { bottom: 8px; right: 8px; border-left: none; border-top: none; }
+
+/* --- ФОРМА ВВОДА --- */
+.field { margin-bottom: 20px; }
+label { display: block; font-family: 'Montserrat', sans-serif; font-size: 11px; color: var(--gold); margin-bottom: 6px; text-transform: uppercase; letter-spacing: 1.5px; text-align: center; }
+.input {
+  width: 100%; max-width: 100%; height: 50px; padding: 0 16px; 
+  border-radius: 8px; border: 1px solid var(--gold-dim); 
+  background: rgba(0, 0, 0, 0.5); color: var(--text-light); 
+  font-size: 16px; outline: none; font-family: 'Cormorant Garamond', serif;
+  text-align: center; transition: 0.3s; box-sizing: border-box;
+  appearance: none; -webkit-appearance: none;
+}
+.input:focus { border-color: var(--gold); background: rgba(0, 0, 0, 0.8); }
+
+/* --- КНОПКИ --- */
+.btn {
+  width: 100%; height: 54px; border-radius: 12px;
+  font-family: 'Montserrat', sans-serif; font-size: 13px; font-weight: 500; text-transform: uppercase; letter-spacing: 1px;
+  cursor: pointer; transition: 0.3s; display: flex; justify-content: center; align-items: center;
+  background: transparent; border: 1px solid var(--gold); color: var(--gold);
+}
+.btn:hover { background: rgba(220, 179, 117, 0.1); }
+.btn:active { transform: scale(0.98); }
+
+/* --- СТОЛ С КАРТАМИ --- */
+.table-header { text-align: center; margin-bottom: 30px; position: absolute; top: 8%; left: 0; width: 100%; padding: 0 20px; }
+
+.deck-container {
+  display: flex; justify-content: center; align-items: center; gap: 15px;
+  margin-top: 50px; perspective: 1000px;
+}
+
+.card-wrap {
+  display: flex; flex-direction: column; align-items: center; width: 30%;
+}
+.card-label {
+  font-family: 'Cinzel', serif; font-size: 12px; color: var(--gold); margin-top: 12px; letter-spacing: 1px;
+  opacity: 0.7; transition: 0.3s;
+}
+
+.card-slot {
+  width: 100%; aspect-ratio: 1 / 1.68;
+  position: relative; cursor: pointer;
+  transform-style: preserve-3d;
+}
+
+/* Анимация левитации */
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-6px); }
+}
+.card-wrap:nth-child(1) .card-slot { animation: float 4s ease-in-out infinite; }
+.card-wrap:nth-child(2) .card-slot { animation: float 4s ease-in-out infinite 1.3s; }
+.card-wrap:nth-child(3) .card-slot { animation: float 4s ease-in-out infinite 2.6s; }
+
+/* 3D переворот - ИСПРАВЛЕН БАГ СО СКРОЛЛОМ */
+.card-inner {
+  width: 100%; height: 100%; position: absolute; top: 0; left: 0;
+  transition: transform 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275); 
+  transform-style: preserve-3d;
+  box-shadow: 0 10px 20px rgba(0,0,0,0.8); border-radius: 8px;
+}
+.card-slot.flipped .card-inner { transform: rotateY(180deg); box-shadow: 0 0 20px var(--gold-dim); }
+.card-slot.flipped + .card-label { opacity: 1; color: var(--text-light); }
+
+.card-front, .card-back {
+  position: absolute; width: 100%; height: 100%; 
+  backface-visibility: hidden; -webkit-backface-visibility: hidden;
+  border-radius: 8px; overflow: hidden; border: 1px solid var(--gold-dim);
+  background-color: #0c0714; /* Жесткая заливка спасает от прозрачности при скролле */
+}
+.card-front { transform: rotateY(180deg); }
+.card-img { width: 100%; height: 100%; object-fit: cover; display: block; }
+
+/* --- ПОПАП (РАСКРЫТИЕ КАРТЫ) --- */
+.overlay {
+  position: fixed; inset: 0; background: rgba(12, 7, 20, 0.9); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
+  z-index: 100; display: flex; align-items: center; justify-content: center;
+  opacity: 0; pointer-events: none; transition: 0.4s ease; padding: 20px;
+}
+.overlay.visible { opacity: 1; pointer-events: auto; }
+
+.reveal-panel {
+  background: var(--bg-panel); border: 1px solid var(--gold-dim);
+  border-radius: 16px; width: 100%; max-width: 380px; padding: 30px 24px;
+  box-shadow: 0 20px 50px rgba(0,0,0,0.9), inset 0 0 20px rgba(220,179,117,0.05);
+  transform: translateY(20px) scale(0.95); transition: 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); 
+  max-height: 90vh; overflow-y: auto;
+}
+.reveal-panel::-webkit-scrollbar { display: none; }
+.overlay.visible .reveal-panel { transform: translateY(0) scale(1); }
+
+.reveal-img-wrap { 
+  width: 140px; margin: 0 auto 20px; border-radius: 8px; overflow: hidden; 
+  border: 1px solid var(--gold); box-shadow: 0 0 20px rgba(220,179,117,0.2); 
+}
+.reveal-img-wrap img { width: 100%; display: block; }
+.reveal-title { font-size: 24px; color: var(--text-light); margin-bottom: 6px; }
+.reveal-keywords { font-family: 'Montserrat', sans-serif; font-size: 11px; color: var(--gold); text-transform: uppercase; letter-spacing: 1px; text-align: center; margin-bottom: 16px; opacity: 0.8;}
+.reveal-desc { font-size: 17px; color: var(--text-muted); line-height: 1.5; margin-bottom: 24px; text-align: center; font-style: italic;}
+
+/* Кнопки мессенджеров (из референса) */
+.contact-list { margin-top: 20px; padding-top: 20px; border-top: 1px solid rgba(220,179,117,0.2); }
+.contact-title { font-family: 'Cormorant Garamond', serif; font-size: 18px; color: var(--gold); text-align: center; margin-bottom: 16px; }
+
+.contact-btn {
+  display: flex; align-items: center; justify-content: space-between;
+  width: 100%; height: 52px; padding: 0 20px; margin-bottom: 10px;
+  border-radius: 12px; text-decoration: none; 
+  border: 1px solid rgba(220,179,117,0.4); background: rgba(0,0,0,0.6);
+  transition: 0.3s;
+}
+.contact-btn:hover { background: rgba(220,179,117,0.1); border-color: var(--gold); }
+.contact-btn .name { font-family: 'Montserrat', sans-serif; font-size: 14px; color: #fff; font-weight: 500; }
+.contact-btn .action { font-family: 'Montserrat', sans-serif; font-size: 10px; color: var(--gold); text-transform: uppercase; font-weight: 600; letter-spacing: 1px;}
+
+</style>
+</head>
+<body>
+
+<!-- Звездный фон -->
+<div class="bg-animation">
+  <div id="stars"></div>
+  <div id="stars2"></div>
+  <div id="stars3"></div>
+</div>
+
+<div class="app">
+  
+  <!-- СЦЕНА 1: ФОРМА -->
+  <div class="scene center" id="formScene">
+    <div class="mystic-panel">
+      <h1>Начать гадание</h1>
+      <div class="separator"></div>
+      <p class="text">Позвольте картам приоткрыть завесу тайны. Укажите ваши данные для сонастройки с колодой.</p>
+
+      <div class="field">
+        <label>Ваше имя</label>
+        <input id="nameInput" class="input" placeholder="Анна" />
+      </div>
+      <div class="field">
+        <label>Дата рождения</label>
+        <input id="dateInput" class="input" type="date" />
+      </div>
+      
+      <button id="startBtn" class="btn" style="margin-top: 30px;">Продолжить</button>
+    </div>
+  </div>
+
+  <!-- СЦЕНА 2: СТОЛ С 3 КАРТАМИ -->
+  <div class="scene hidden" id="tableScene">
+    <div class="table-header">
+      <h2 id="tableTitle">Прошлое • Настоящее • Будущее</h2>
+      <p id="tableSubtitle">Выберите первую карту</p>
+    </div>
+
+    <div class="deck-container">
+      <!-- Карта 1 -->
+      <div class="card-wrap">
+        <div class="card-slot" data-index="0">
+          <div class="card-inner">
+            <div class="card-back"><img src="" class="card-img js-back-img"></div>
+            <div class="card-front"><img src="" class="card-img" id="cardImg0"></div>
+          </div>
+        </div>
+        <div class="card-label">I</div>
+      </div>
+      
+      <!-- Карта 2 -->
+      <div class="card-wrap">
+        <div class="card-slot" data-index="1">
+          <div class="card-inner">
+            <div class="card-back"><img src="" class="card-img js-back-img"></div>
+            <div class="card-front"><img src="" class="card-img" id="cardImg1"></div>
+          </div>
+        </div>
+        <div class="card-label">II</div>
+      </div>
+
+      <!-- Карта 3 -->
+      <div class="card-wrap">
+        <div class="card-slot" data-index="2">
+          <div class="card-inner">
+            <div class="card-back"><img src="" class="card-img js-back-img"></div>
+            <div class="card-front"><img src="" class="card-img" id="cardImg2"></div>
+          </div>
+        </div>
+        <div class="card-label">III</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ВСПЛЫВАЮЩЕЕ ОКНО (РАСКРЫТИЕ КАРТЫ) -->
+  <div class="overlay" id="overlay">
+    <div class="reveal-panel">
+      <div class="reveal-img-wrap">
+        <img id="revealImage" src="" alt="Карта">
+      </div>
+      
+      <h3 class="reveal-title" id="revealTitle">Название</h3>
+      <div class="reveal-keywords" id="revealKeywords">Ключевые слова</div>
+      <p class="reveal-desc" id="revealDesc">Описание</p>
+      
+      <div id="actionContainer">
+        <!-- Кнопка "Далее" или Мессенджеры генерируются через JS -->
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+/* =========================================
+   НАСТРОЙКИ КАРТИНОК И ТЕКСТОВ
+   Убедись, что файлы лежат в той же папке,
+   либо укажи полный путь, например: "images/back.webp"
+========================================= */
+const IMAGES = {
+  back: "back.webp", 
+  card1: "the-lovers.webp",
+  card2: "the-moon.webp",
+  card3: "wheel-of-fortune.webp"
+};
+
+const CONTACTS = {
+  whatsapp: 'https://wa.me/79000000000',
+  telegram: 'https://t.me/username'
+};
+
+// Тексты для 3х карт
+const READING_DATA = [
+  {
+    title: 'Влюбленные',
+    keywords: 'Выбор | Притяжение | Искренность',
+    image: IMAGES.card1,
+    desc: 'Карта указывает на важность выбора сердцем. В вашей ситуации сейчас пересекаются чувства и необходимость принять важное решение.'
+  },
+  {
+    title: 'Луна',
+    keywords: 'Тайна | Интуиция | Иллюзии',
+    image: IMAGES.card2,
+    desc: 'Не все сейчас лежит на поверхности. Доверьтесь своим снам и предчувствиям. Туман скоро рассеется, открыв скрытые мотивы.'
+  },
+  {
+    title: 'Колесо Фортуны',
+    keywords: 'Цикличность | Судьба | Перемены',
+    image: IMAGES.card3,
+    desc: 'Колесо судьбы делает оборот. Ситуация готова разрешиться. Чтобы узнать точный сценарий и получить детальный совет таролога, напишите мне лично.'
+  }
+];
+
+const state = {
+  name: '',
+  pickedCount: 0
+};
+
+const formScene = document.getElementById('formScene');
+const tableScene = document.getElementById('tableScene');
+const overlay = document.getElementById('overlay');
+const startBtn = document.getElementById('startBtn');
+const tableSubtitle = document.getElementById('tableSubtitle');
+const actionContainer = document.getElementById('actionContainer');
+
+// Ставим рубашки
+document.querySelectorAll('.js-back-img').forEach(img => {
+  img.src = IMAGES.back;
+});
+
+// Кнопка СТАРТ
+startBtn.addEventListener('click', () => {
+  const name = document.getElementById('nameInput').value.trim();
+  if(name.length < 2) {
+    document.getElementById('nameInput').focus();
+    return;
+  }
+  state.name = name;
+  formScene.classList.add('hidden');
+  tableScene.classList.remove('hidden');
+});
+
+// Клик по карте
+document.querySelectorAll('.card-slot').forEach(slot => {
+  slot.addEventListener('click', function() {
+    if (this.classList.contains('flipped')) return; 
+    
+    this.classList.add('flipped');
+    const currentCard = READING_DATA[state.pickedCount];
+    
+    // Ставим лицо карте
+    const imgEl = document.getElementById(`cardImg${this.dataset.index}`);
+    imgEl.src = currentCard.image;
+    
+    // Ждем завершения 3D переворота (0.8s) и показываем попап
+    setTimeout(() => {
+      showReveal(currentCard, state.pickedCount);
+    }, 850);
+  });
+});
+
+// Показ окна
+function showReveal(cardData, index) {
+  document.getElementById('revealImage').src = cardData.image;
+  document.getElementById('revealTitle').textContent = cardData.title;
+  document.getElementById('revealKeywords').textContent = cardData.keywords;
+  
+  // Добавляем имя пользователя в текст
+  let personalizedDesc = cardData.desc;
+  if(index === 0) personalizedDesc = state.name + ", " + personalizedDesc.toLowerCase();
+  document.getElementById('revealDesc').textContent = personalizedDesc;
+
+  if (index < 2) {
+    actionContainer.innerHTML = `<button class="btn" onclick="nextStep()">Посмотреть дальше</button>`;
+  } else {
+    // 3-я карта - Мессенджеры
+    actionContainer.innerHTML = `
+      <div class="contact-list">
+        <div class="contact-title">Узнайте полный ответ:</div>
+        <a class="contact-btn" href="${CONTACTS.whatsapp}">
+          <span class="name">WhatsApp</span>
+          <span class="action">Написать</span>
+        </a>
+        <a class="contact-btn" href="${CONTACTS.telegram}">
+          <span class="name">Telegram</span>
+          <span class="action">Написать</span>
+        </a>
+      </div>
+    `;
+  }
+  overlay.classList.add('visible');
+}
+
+// Следующий шаг
+window.nextStep = function() {
+  state.pickedCount++;
+  overlay.classList.remove('visible');
+  
+  if (state.pickedCount === 1) {
+    tableSubtitle.textContent = "Откройте вторую карту";
+  } else if (state.pickedCount === 2) {
+    tableSubtitle.textContent = "Узнайте итог";
+  }
+};
+</script>
+
+</body>
+</html>
